@@ -19,12 +19,15 @@ public class MarbleQuiz {
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         frame.setSize(WIDTH, HEIGHT);
         frame.setResizable(false);
-
-        this.panel = new JPanel();
+        String[] responses = {"red", "green", "blue", "orange"};
+        QuestionPanel q = new QuestionPanel("Which is the best color", responses, 1);
+        this.panel = q.getQuestionPanel();
         JLabel text = new JLabel("Test");
         panel.add(text);
         frame.add(panel);
         frame.setVisible(true);
+
+
     }
 
 
