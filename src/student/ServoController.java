@@ -1,27 +1,30 @@
-package student;
 /*
  * Java Embedded Raspberry Pi Servo app
  */
+package student;
 
-        import java.io.FileWriter;
-        import java.io.File;
+import java.io.FileWriter;
+import java.io.File;
 
 /**
  *
  * @author hinkmond
  */
-public class ServoController {
+public class ServoController implements Runnable {
 
     static final String GPIO_OUT = "out";
     static final String GPIO_ON = "1";
     static final String GPIO_OFF = "0";
 
-    private FileWriter commandChannel;
+    static String[] GpioChannels =  { "18" };
 
-    static String[] GpioChannels =  { "24" };
+    private int position;
 
-    @SuppressWarnings("UseSpecificCatch")
-    public ServoController() {
+    public ServoController(int start) {
+        this.position = start;
+    }
+
+    public void run() {
         FileWriter[] commandChannels;
 
         try {
@@ -63,7 +66,7 @@ public class ServoController {
             /*** Send commands to GPIO port ***/
 
             // Set up a GPIO port as a command channel
-            commandChannel = new
+            FileWriter commandChannel = new
                     FileWriter("/sys/class/gpio/gpio" +
                     GpioChannels[0] + "/value");
 
@@ -76,16 +79,30 @@ public class ServoController {
             // Loop forever to create Pulse Width Modulation - PWM
             while (true) {
 
+                int nshigh = 1000000 + (int)(1000000.*((double)position/180.));
+                int nslow = 20000000 - nshigh;
+                int mshigh = nshigh / 1000000;
+                int mslow = nslow / 1000000;
+                nshigh %= 1000000;
+                nslow %= 1000000;
+
+                commandChannel.write(GPIO_ON);
+                commandChannel.flush();
+                java.lang.Thread.sleep(mshigh, nshigh);
+                commandChannel.write(GPIO_OFF);
+                commandChannel.flush();
+                java.lang.Thread.sleep(mslow, nslow);
+
                 /*--- Move servo clockwise to 90 degree position ---*/
 
                 // Create a pulse for repeatLoop number of cycles
-                for (counter=0; counter<repeatLoop; counter++) {
+                /*for (counter=0; counter<repeatLoop; counter++) {
 
                     // HIGH: Set GPIO port ON
                     commandChannel.write(GPIO_ON);
                     commandChannel.flush();
 
-                    // Pulse Width determined by amount of
+                    // Pulse Width determined by amount of 
                     //   sleep time while HIGH
                     java.lang.Thread.sleep(0, 800000);
 
@@ -93,22 +110,22 @@ public class ServoController {
                     commandChannel.write(GPIO_OFF);
                     commandChannel.flush();
 
-                    // Frequency determined by amount of
+                    // Frequency determined by amount of 
                     //  sleep time while LOW
                     java.lang.Thread.sleep(period);
                 }
-
-                /*--- Move servo counterclockwise to 0
+                
+                /*--- Move servo counterclockwise to 0 
 				degree position ---*/
 
                 // Create a pulse for repeatLoop number of cycles
-                for (counter=0; counter<repeatLoop; counter++) {
+                /*for (counter=0; counter<repeatLoop; counter++) {
 
                     // HIGH: Set GPIO port ON
                     commandChannel.write(GPIO_ON);
                     commandChannel.flush();
 
-                    // Pulse Width determined by amount of
+                    // Pulse Width determined by amount of 
                     //   time while HIGH
                     java.lang.Thread.sleep(2, 200000);
 
@@ -116,10 +133,10 @@ public class ServoController {
                     commandChannel.write(GPIO_OFF);
                     commandChannel.flush();
 
-                    // Frequency determined by amount of
+                    // Frequency determined by amount of 
                     //  time while LOW
                     java.lang.Thread.sleep(period);
-                }
+                }*/
             }
 
         } catch (Exception exception) {

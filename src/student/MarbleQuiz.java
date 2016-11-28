@@ -20,8 +20,10 @@ public class MarbleQuiz {
     public MarbleQuiz() {
         this.frame = new JFrame();
         frame.setTitle("MarbleQuiz");
-        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        frame.setSize(WIDTH, HEIGHT);
+        frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+        //frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        //frame.setSize(WIDTH, HEIGHT);
+        frame.setBounds(0,0,WIDTH,HEIGHT);
         frame.setResizable(false);
         this.quiz = new MultiplicationMC(2, 12, 10);;
         this.panel = quiz.getQuestionPanel(0).getQuestionPanel();
