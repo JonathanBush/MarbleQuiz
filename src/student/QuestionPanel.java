@@ -20,22 +20,26 @@ public class QuestionPanel implements ActionListener{
 
     private boolean correct;
 
-    public QuestionPanel(String question, String[] responses, int answer) {
+    public QuestionPanel(String question, String[] responses, int answer, int width, int height) {
         this.correct = false;
         this.question = new String(question);
         this.answer = answer;
         this.responses = new String[responses.length];
         System.arraycopy(responses, 0, this.responses, 0, responses.length);
         questionPanel = new JPanel();
-        LayoutManager layout = new BoxLayout(questionPanel, BoxLayout.PAGE_AXIS);
+        LayoutManager layout = new GridLayout(5,1);
         questionPanel.setLayout(layout);
         this.responseButtons = new JButton[this.responses.length];
         this.questionLabel = new JLabel(this.question);
         questionPanel.add(this.questionLabel);
+        //JPanel sub = new JPanel();
         for (int i = 0; i < this.responses.length; i++) {
             this.responseButtons[i] = new JButton(this.responses[i]);
             this.responseButtons[i].setActionCommand(Integer.toString(i));
             this.responseButtons[i].addActionListener(this);
+            this.responseButtons[i].setPreferredSize(new Dimension(width, height/5));
+            this.responseButtons[i].setBackground(Color.lightGray);
+            this.responseButtons[i].setOpaque(true);
             questionPanel.add(this.responseButtons[i]);
 
         }
@@ -53,6 +57,10 @@ public class QuestionPanel implements ActionListener{
 
     public JPanel getQuestionPanel() {
         return this.questionPanel;
+    }
+
+    public boolean answeredCorrectly() {
+        return correct;
     }
 
 }
