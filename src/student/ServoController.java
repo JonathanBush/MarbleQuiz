@@ -24,6 +24,10 @@ public class ServoController implements Runnable {
         this.position = start;
     }
 
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
     public void run() {
         FileWriter[] commandChannels;
 

@@ -17,6 +17,8 @@ public class MarbleQuiz {
 
     private int current;
 
+    ServoController servo;
+
     public MarbleQuiz() {
         this.frame = new JFrame();
         frame.setTitle("MarbleQuiz");
@@ -31,7 +33,7 @@ public class MarbleQuiz {
         frame.setVisible(true);
         this.current = 0;
         this.update();
-
+        this.servo = new ServoController(90);
     }
 
     public void update() {
@@ -56,6 +58,7 @@ public class MarbleQuiz {
             }
             frame.revalidate();
         }
+        servo.setPosition(80 + 20*(current % 2));
     }
 
 
