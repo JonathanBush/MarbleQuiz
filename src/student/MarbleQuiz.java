@@ -1,6 +1,7 @@
 package student;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Created by jon on 11/16/2016.
@@ -22,43 +23,82 @@ public class MarbleQuiz {
     public MarbleQuiz() {
         this.frame = new JFrame();
         frame.setTitle("MarbleQuiz");
-        frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-        //frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        //frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         //frame.setSize(WIDTH, HEIGHT);
         frame.setBounds(0,0,WIDTH,HEIGHT);
         frame.setResizable(false);
+        this.servo = new ServoController(90);
+        (new Thread(servo)).start();
+        initialize();
+    }
+
+    private void initialize() {
+        if (panel != null)
+            frame.remove(panel);
+        frame.revalidate();
+        JOptionPane.showMessageDialog(null, "Start new round...");
         this.quiz = new MultiplicationMC(2, 12, 10);;
         this.panel = quiz.getQuestionPanel(0).getQuestionPanel();
         frame.add(panel);
         frame.setVisible(true);
         this.current = 0;
+
         this.update();
-        this.servo = new ServoController(90);
     }
 
     public void update() {
-        if (current < 10 && quiz.getQuestionPanel(current).answeredCorrectly()) {
+        if (current < 10 && quiz.getQuestionPanel(current).getCorrect() == 1) {
             frame.remove(panel);
             current++;
+            servo.setDutyCycle(.07+ .055 *(current % 2));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
             frame.remove(panel);
             if (current < 10) {
                 panel = quiz.getQuestionPanel(current).getQuestionPanel();
                 frame.add(panel);
                 frame.revalidate();
             }
-        } else if (current == 10) {
-            frame.remove(panel);
-            this.panel = new JPanel();
-            this.panel.add(new JLabel("You finished all of the questions!"));
-            frame.add(panel);
+        } else if (current < 10 && quiz.getQuestionPanel(current).getCorrect() == -1) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(750);
             } catch (InterruptedException e) {
                 // Ignore
             }
+            quiz.getQuestionPanel(current).tryAgain();
+        } else if (current == 10) {
+            frame.remove(panel);
+            this.panel = new JPanel();
+            JLabel finishText = new JLabel("You finished all of the questions!");
+            finishText.setFont(new Font("Arial", Font.PLAIN, 40));
+            this.panel.add(finishText);
+            frame.add(panel);
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+            current++;
+            servo.setDutyCycle(.07+ .055 *(current % 2));
+            frame.revalidate();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+            initialize();
             frame.revalidate();
         }
-        servo.setPosition(80 + 20*(current % 2));
+
+
+
+
+
     }
 
 

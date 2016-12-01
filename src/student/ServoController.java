@@ -6,26 +6,29 @@ package student;
 import java.io.FileWriter;
 import java.io.File;
 
-/**
- *
- * @author hinkmond
- */
 public class ServoController implements Runnable {
 
     static final String GPIO_OUT = "out";
     static final String GPIO_ON = "1";
     static final String GPIO_OFF = "0";
+    static final int PERIOD = 20000000;
 
     static String[] GpioChannels =  { "18" };
 
     private int position;
+    private double dutyCycle;
 
     public ServoController(int start) {
-        this.position = start;
+        this.setPosition(start);
     }
 
     public void setPosition(int position) {
-        this.position = position;
+        this.dutyCycle = .025 + .099*((double)position/180.);
+        //this.position = position;
+    }
+
+    public void setDutyCycle(double dutyCycle) {
+        this.dutyCycle = dutyCycle;
     }
 
     public void run() {
@@ -83,8 +86,8 @@ public class ServoController implements Runnable {
             // Loop forever to create Pulse Width Modulation - PWM
             while (true) {
 
-                int nshigh = 1000000 + (int)(1000000.*((double)position/180.));
-                int nslow = 20000000 - nshigh;
+                int nshigh = (int)(PERIOD * dutyCycle);
+                int nslow = PERIOD - nshigh;
                 int mshigh = nshigh / 1000000;
                 int mslow = nslow / 1000000;
                 nshigh %= 1000000;
@@ -96,51 +99,6 @@ public class ServoController implements Runnable {
                 commandChannel.write(GPIO_OFF);
                 commandChannel.flush();
                 java.lang.Thread.sleep(mslow, nslow);
-
-                /*--- Move servo clockwise to 90 degree position ---*/
-
-                // Create a pulse for repeatLoop number of cycles
-                /*for (counter=0; counter<repeatLoop; counter++) {
-
-                    // HIGH: Set GPIO port ON
-                    commandChannel.write(GPIO_ON);
-                    commandChannel.flush();
-
-                    // Pulse Width determined by amount of 
-                    //   sleep time while HIGH
-                    java.lang.Thread.sleep(0, 800000);
-
-                    // LOW: Set GPIO port OFF
-                    commandChannel.write(GPIO_OFF);
-                    commandChannel.flush();
-
-                    // Frequency determined by amount of 
-                    //  sleep time while LOW
-                    java.lang.Thread.sleep(period);
-                }
-                
-                /*--- Move servo counterclockwise to 0 
-				degree position ---*/
-
-                // Create a pulse for repeatLoop number of cycles
-                /*for (counter=0; counter<repeatLoop; counter++) {
-
-                    // HIGH: Set GPIO port ON
-                    commandChannel.write(GPIO_ON);
-                    commandChannel.flush();
-
-                    // Pulse Width determined by amount of 
-                    //   time while HIGH
-                    java.lang.Thread.sleep(2, 200000);
-
-                    // LOW: Set GPIO port OFF
-                    commandChannel.write(GPIO_OFF);
-                    commandChannel.flush();
-
-                    // Frequency determined by amount of 
-                    //  time while LOW
-                    java.lang.Thread.sleep(period);
-                }*/
             }
 
         } catch (Exception exception) {
