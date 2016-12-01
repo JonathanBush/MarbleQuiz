@@ -2,6 +2,12 @@ package student;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 /**
  * Created by jon on 11/16/2016.
@@ -37,8 +43,17 @@ public class MarbleQuiz {
         if (panel != null)
             frame.remove(panel);
         frame.revalidate();
+        int low, high;
+        try {
+            Scanner settings = new Scanner(new File("/media/pi/MARBLEQUIZ/bounds.txt"));
+            low = settings.nextInt();
+            high = settings.nextInt();
+        } catch (FileNotFoundException | InputMismatchException e) {
+            low = 2;
+            high = 12;
+        }
         JOptionPane.showMessageDialog(null, "Start new round...");
-        this.quiz = new MultiplicationMC(2, 12, 10);;
+        this.quiz = new MultiplicationMC(low, high, 10);;
         this.panel = quiz.getQuestionPanel(0).getQuestionPanel();
         frame.add(panel);
         frame.setVisible(true);
