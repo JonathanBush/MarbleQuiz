@@ -20,9 +20,10 @@ public class MarbleQuiz {
     private JFrame frame;
     private JPanel panel;
 
-    private MultiplicationMC quiz;
+    private QuestionSet quiz;
 
     private int current;
+    private long startTime;
 
     ServoController servo;
 
@@ -40,6 +41,7 @@ public class MarbleQuiz {
     }
 
     private void initialize() {
+        this.current = 0;
         if (panel != null)
             frame.remove(panel);
         frame.revalidate();
@@ -53,25 +55,29 @@ public class MarbleQuiz {
             high = 12;
         }
         JOptionPane.showMessageDialog(null, "Start new round...");
-        this.quiz = new MultiplicationMC(low, high, 10);;
+        this.startTime = System.currentTimeMillis();
+        this.quiz = new AdditionMC(low, high, 10);;
         this.panel = quiz.getQuestionPanel(0).getQuestionPanel();
         frame.add(panel);
         frame.setVisible(true);
         this.current = 0;
-
+        servo.enable(true);
+        sleepMillis(100);
+        servo.setDutyCycle(.07+ .055 *(current % 2));
+        sleepMillis(200);
+        servo.enable(false);
         this.update();
     }
 
     public void update() {
         if (current < 10 && quiz.getQuestionPanel(current).getCorrect() == 1) {
-            frame.remove(panel);
+            servo.enable(true);
+            sleepMillis(100);
+            //frame.remove(panel);
             current++;
             servo.setDutyCycle(.07+ .055 *(current % 2));
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
+            sleepMillis(900);
+            servo.enable(false);
             frame.remove(panel);
             if (current < 10) {
                 panel = quiz.getQuestionPanel(current).getQuestionPanel();
@@ -79,33 +85,30 @@ public class MarbleQuiz {
                 frame.revalidate();
             }
         } else if (current < 10 && quiz.getQuestionPanel(current).getCorrect() == -1) {
-            try {
-                Thread.sleep(750);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
+            sleepMillis(750);
             quiz.getQuestionPanel(current).tryAgain();
         } else if (current == 10) {
             frame.remove(panel);
             this.panel = new JPanel();
-            JLabel finishText = new JLabel("You finished all of the questions!");
+            panel.setLayout(new GridLayout(5,1));
+            //panel.setLayout(new GridLayout(5,1));
+            JLabel finishText = new JLabel("You finished all of the questions!\n");
+            finishText.setHorizontalAlignment(JLabel.CENTER);
             finishText.setFont(new Font("Arial", Font.PLAIN, 40));
             this.panel.add(finishText);
+            long time = System.currentTimeMillis() - startTime;
+            JLabel finishTime = new JLabel((time / 60000) + ":" + (((time/1000)%60) < 10 ? "0" : "") + ((time/1000)%60) + "." + (time % 1000));
+            finishTime.setHorizontalAlignment(JLabel.CENTER);
+            finishTime.setFont(new Font("Arial", Font.PLAIN, 36));
+            this.panel.add(finishTime);
             frame.add(panel);
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
+            servo.enable(true);
+            sleepMillis(500);
             current++;
             servo.setDutyCycle(.07+ .055 *(current % 2));
             frame.revalidate();
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
+            sleepMillis(5000);
+            servo.enable(false);
             initialize();
             frame.revalidate();
         }
@@ -126,6 +129,14 @@ public class MarbleQuiz {
             } catch (InterruptedException e) {
                 // ignore
             }
+        }
+    }
+
+    public void sleepMillis(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            // ignore
         }
     }
 

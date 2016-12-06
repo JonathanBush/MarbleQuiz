@@ -7,7 +7,7 @@ import java.util.Random;
 /**
  * Created by jon on 11/27/2016.
  */
-public class MultiplicationMC {
+public class MultiplicationMC implements QuestionSet{
 
     private int lower;
     private int upper;

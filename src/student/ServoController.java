@@ -5,6 +5,7 @@ package student;
 
 import java.io.FileWriter;
 import java.io.File;
+import java.io.IOException;
 
 public class ServoController implements Runnable {
 
@@ -12,8 +13,10 @@ public class ServoController implements Runnable {
     static final String GPIO_ON = "1";
     static final String GPIO_OFF = "0";
     static final int PERIOD = 20000000;
+    private FileWriter enableChannel;
+    private boolean enable;
 
-    static String[] GpioChannels =  { "18" };
+    static String[] GpioChannels =  { "18","26" };
 
     private int position;
     private double dutyCycle;
@@ -29,6 +32,16 @@ public class ServoController implements Runnable {
 
     public void setDutyCycle(double dutyCycle) {
         this.dutyCycle = dutyCycle;
+    }
+
+    public void enable(boolean enable) {
+        this.enable = enable;
+        try {
+           // enableChannel.write(enable ? GPIO_ON : GPIO_OFF);
+            //enableChannel.flush();
+        } catch (IOException e) {
+            System.out.println("error writing to enable channel");
+        }
     }
 
     public void run() {
@@ -76,12 +89,9 @@ public class ServoController implements Runnable {
             FileWriter commandChannel = new
                     FileWriter("/sys/class/gpio/gpio" +
                     GpioChannels[0] + "/value");
+            enableChannel = new FileWriter("/sys/class/gpio/gpio" + GpioChannels[1] + "/value");
 
             // Set initial variables for PWM
-            int period = 20;
-            int repeatLoop = 25;
-
-            int counter;
 
             // Loop forever to create Pulse Width Modulation - PWM
             while (true) {
@@ -93,8 +103,10 @@ public class ServoController implements Runnable {
                 nshigh %= 1000000;
                 nslow %= 1000000;
 
-                commandChannel.write(GPIO_ON);
-                commandChannel.flush();
+                if (enable) {
+                    commandChannel.write(GPIO_ON);
+                    commandChannel.flush();
+                }
                 java.lang.Thread.sleep(mshigh, nshigh);
                 commandChannel.write(GPIO_OFF);
                 commandChannel.flush();
