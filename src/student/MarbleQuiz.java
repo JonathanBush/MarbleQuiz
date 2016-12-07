@@ -36,7 +36,7 @@ public class MarbleQuiz {
         frame.setBounds(0,0,WIDTH,HEIGHT);
         frame.setResizable(false);
         this.servo = new ServoController(90);
-        (new Thread(servo)).start();
+        //(new Thread(servo)).start();
         initialize();
     }
 
@@ -56,7 +56,7 @@ public class MarbleQuiz {
         }
         JOptionPane.showMessageDialog(null, "Start new round...");
         this.startTime = System.currentTimeMillis();
-        this.quiz = new AdditionMC(low, high, 10);;
+        this.quiz = new SubtractionMC(low, high, 10);;
         this.panel = quiz.getQuestionPanel(0).getQuestionPanel();
         frame.add(panel);
         frame.setVisible(true);

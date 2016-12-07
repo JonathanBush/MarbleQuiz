@@ -36,12 +36,12 @@ public class ServoController implements Runnable {
 
     public void enable(boolean enable) {
         this.enable = enable;
-        try {
-           // enableChannel.write(enable ? GPIO_ON : GPIO_OFF);
-            //enableChannel.flush();
+        /*try {
+            enableChannel.write(enable ? GPIO_ON : GPIO_OFF);
+            enableChannel.flush();
         } catch (IOException e) {
             System.out.println("error writing to enable channel");
-        }
+        }*/
     }
 
     public void run() {
