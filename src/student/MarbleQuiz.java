@@ -45,18 +45,41 @@ public class MarbleQuiz {
         if (panel != null)
             frame.remove(panel);
         frame.revalidate();
-        int low, high;
+        int[] low = new int[4], high = new int[4];
         try {
             Scanner settings = new Scanner(new File("/media/pi/MARBLEQUIZ/bounds.txt"));
-            low = settings.nextInt();
-            high = settings.nextInt();
-        } catch (FileNotFoundException | InputMismatchException e) {
-            low = 2;
-            high = 12;
+            for (int i = 0; i < 4; i++) {
+                low[i] = settings.nextInt();
+                high[i] = settings.nextInt();
+            }
+        } catch (Throwable e) {
+            low = new int[]{2,2,1,1};
+            high = new int[]{12,12,20,20};
         }
-        JOptionPane.showMessageDialog(null, "Start new round...");
+        //JOptionPane.showMessageDialog(null, "Start new round...");
+        String[] possibleValues = { "Multiplication", "Division", "Addition", "Subtraction" };
+        Object selectedValue = JOptionPane.showInputDialog(null,
+                "Choose type", "Start a new game",
+                JOptionPane.INFORMATION_MESSAGE, null,
+                possibleValues, possibleValues[0]);
+        switch ((String)selectedValue) {
+            case "Multiplication":
+                this.quiz = new MultiplicationMC(low[0], high[0], 10);
+                break;
+            case "Division":
+                this.quiz = new DivisionMC(low[1], high[1], 10);;
+                break;
+            case "Addition":
+                this.quiz = new AdditionMC(low[2], high[2], 10);;
+                break;
+            case "Subtraction":
+                this.quiz = new SubtractionMC(low[3], high[3], 10);;
+                break;
+            default:
+                this.quiz = new MultiplicationMC(low[0], high[0], 10);;
+        }
+        //this.quiz = new DivisionMC(low, high, 10);;
         this.startTime = System.currentTimeMillis();
-        this.quiz = new SubtractionMC(low, high, 10);;
         this.panel = quiz.getQuestionPanel(0).getQuestionPanel();
         frame.add(panel);
         frame.setVisible(true);
